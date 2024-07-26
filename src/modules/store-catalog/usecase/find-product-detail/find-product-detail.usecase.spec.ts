@@ -20,7 +20,7 @@ describe("FindProductDetail usecase unit test", () => {
   it("should return detail of product", async () => {
     const productRepository = MockRepository();
     const usecase = new FindProductDetailUsecase(productRepository);
-    const product = await usecase.execute({ productId: "1" });
+    const product = await usecase.execute({ id: "1" });
 
     expect(product).toBeDefined();
     expect(product.id).toBe("1");

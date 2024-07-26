@@ -15,7 +15,7 @@ export default class FindProductDetailUsecase implements UseCaseInterface {
   async execute(
     input: FindProductDetailInputDto
   ): Promise<FindProductDetailOutputDto> {
-    const product = await this._productRepository.find(input.productId);
+    const product = await this._productRepository.find(input.id);
 
     return {
       id: product.id.id,

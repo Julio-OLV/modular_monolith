@@ -23,6 +23,7 @@ export default class ProductAdmFacade implements ProductAdmFacadeInterface {
     // caso o dto do caso de uso for != do dto da facade, devemos converter o dto da facade para o dto do caso de uso
     return this._addUsecase.execute(input);
   }
+
   checkStock(
     input: CheckStockFacadeInputDto
   ): Promise<CheckStockFacadeOutputDto> {
