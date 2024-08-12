@@ -3,6 +3,8 @@ import UseCaseInterface from "../../../@shared/usecase/use-case.interface";
 import ClientAdmFacadeInterface from "../../../client-adm/facade/client-adm.facade.interface";
 import ProductAdmFacadeInterface from "../../../product-adm/facade/product-adm.facade.interface";
 import StoreCatalogFacadeInterface from "../../../store-catalog/facade/store-catalog.facade.interface";
+import Client from "../../domain/client.entity";
+import Order from "../../domain/order.entity";
 import Product from "../../domain/product.entity";
 import {
   PlaceOrderUsecaseInputDto,
@@ -33,6 +35,22 @@ export default class PlaceOrderUsecase implements UseCaseInterface {
     }
 
     await this.validateProducts(input);
+
+    const products = await Promise.all(
+      input.products.map((p) => this.getProduct(p.productId))
+    );
+
+    const myClient = new Client({
+      id: new Id(client.id),
+      address: client.address,
+      name: client.name,
+      email: client.email,
+    });
+
+    const order = new Order({
+      client: myClient,
+      products,
+    });
 
     return {
       id: "",
