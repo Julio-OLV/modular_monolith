@@ -7,6 +7,8 @@ export interface PlaceOrderUsecaseInputDto {
 
 export interface PlaceOrderUsecaseOutputDto {
   id: string;
+  invoiceId?: string | null | undefined;
+  status: string;
   total: number;
   products: {
     productId: string;

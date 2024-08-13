@@ -30,7 +30,13 @@ describe("Client repository unit tests", () => {
       id: new Id(uuid()),
       name: "client name",
       email: "client@xpto.com",
-      address: "address",
+      document: "0000000000",
+      city: "City X",
+      complement: "Complement X",
+      number: "10",
+      state: "State X",
+      street: "Street X",
+      zipCode: "00000-000",
     };
     const client = new Client(clientProps);
 
@@ -44,7 +50,7 @@ describe("Client repository unit tests", () => {
     expect(clientInDb?.dataValues.id).toEqual(client.id.id);
     expect(clientInDb?.dataValues.name).toEqual(client.name);
     expect(clientInDb?.dataValues.email).toEqual(client.email);
-    expect(clientInDb?.dataValues.address).toEqual(client.address);
+    expect(clientInDb?.dataValues.street).toEqual(client.street);
     expect(clientInDb?.dataValues.createdAt).toBeDefined();
     expect(clientInDb?.dataValues.updatedAt).toBeDefined();
   });
@@ -55,7 +61,13 @@ describe("Client repository unit tests", () => {
       id: "1",
       name: "client name",
       email: "client@xpto.com",
-      address: "address",
+      document: "0000000000",
+      city: "City X",
+      complement: "Complement X",
+      number: "10",
+      state: "State X",
+      street: "Street X",
+      zipCode: "00000-000",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -67,6 +79,6 @@ describe("Client repository unit tests", () => {
     expect(client.id.id).toEqual(clientProps.id);
     expect(client.name).toEqual(clientProps.name);
     expect(client.email).toEqual(clientProps.email);
-    expect(client.address).toEqual(clientProps.address);
+    expect(client.street).toEqual(clientProps.street);
   });
 });

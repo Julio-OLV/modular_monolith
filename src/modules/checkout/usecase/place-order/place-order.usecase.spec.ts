@@ -204,12 +204,12 @@ describe("PlaceOrderUsecase unit tests", () => {
       };
 
       const placeOrderUseCase = new PlaceOrderUsecase(
-        mockClientFacade,
-        null,
-        null,
-        mockCheckoutRepository,
-        mockInvoiceFacade,
-        mockPaymentFacade
+        mockClientFacade as any,
+        null as any,
+        null as any,
+        mockCheckoutRepository as any,
+        mockInvoiceFacade as any,
+        mockPaymentFacade as any
       );
 
       const products = {
@@ -240,6 +240,43 @@ describe("PlaceOrderUsecase unit tests", () => {
         .mockImplementation((productId: keyof typeof products) => {
           return products[productId];
         });
+
+      it("should not be approved", async () => {
+        mockPaymentFacade.process = mockPaymentFacade.process.mockReturnValue({
+          transactionId: "1t",
+          orderId: "1o",
+          amount: 100,
+          status: "error",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        const input: PlaceOrderUsecaseInputDto = {
+          clientId: "1c",
+          products: [{ productId: "1" }, { productId: "2" }],
+        };
+
+        const output = await placeOrderUseCase.execute(input);
+
+        expect(output.invoiceId).toBe(null);
+        expect(output.total).toBe(70);
+        expect(output.products).toStrictEqual([
+          { productId: "1" },
+          { productId: "2" },
+        ]);
+        expect(mockClientFacade.find).toHaveBeenCalledTimes(1);
+        expect(mockClientFacade.find).toHaveBeenCalledWith({ id: "1c" });
+        expect(mockValidateProducts).toHaveBeenCalledTimes(1);
+        expect(mockValidateProducts).toHaveBeenCalledWith(input);
+        expect(mockGetProduct).toHaveBeenCalledTimes(2);
+        expect(mockCheckoutRepository.addOrder).toHaveBeenCalledTimes(1);
+        expect(mockPaymentFacade.process).toHaveBeenCalledTimes(1);
+        expect(mockPaymentFacade.process).toHaveBeenCalledWith({
+          orderId: output.id,
+          amount: output.total,
+        });
+        expect(mockInvoiceFacade.create).toHaveBeenCalledTimes(0);
+      });
     });
   });
 });

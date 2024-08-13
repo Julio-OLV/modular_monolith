@@ -9,7 +9,13 @@ export default class ClientRepository implements ClientGateway {
       id: client.id.id,
       name: client.name,
       email: client.email,
-      address: client.address,
+      city: client.city,
+      complement: client.complement,
+      document: client.document,
+      number: client.number,
+      state: client.state,
+      street: client.street,
+      zipCode: client.zipCode,
       createdAt: client.createdAt,
       updatedAt: client.updatedAt,
     });
@@ -18,13 +24,23 @@ export default class ClientRepository implements ClientGateway {
   async find(id: string): Promise<Client> {
     const clientInDb = await ClientModel.findOne({ where: { id } });
 
+    if (!clientInDb) {
+      throw new Error("Client not found with id");
+    }
+
     return new Client({
-      id: new Id(clientInDb?.dataValues.id),
-      name: clientInDb?.dataValues.name,
-      email: clientInDb?.dataValues.email,
-      address: clientInDb?.dataValues.address,
-      createdAt: clientInDb?.dataValues.createdAt,
-      updatedAt: clientInDb?.dataValues.updatedAt,
+      id: new Id(clientInDb.dataValues.id),
+      name: clientInDb.dataValues.name,
+      email: clientInDb.dataValues.email,
+      city: clientInDb.dataValues.city,
+      complement: clientInDb.dataValues.complement,
+      document: clientInDb.dataValues.document,
+      number: clientInDb.dataValues.number,
+      state: clientInDb.dataValues.state,
+      street: clientInDb.dataValues.street,
+      zipCode: clientInDb.dataValues.zipCode,
+      createdAt: clientInDb.dataValues.createdAt,
+      updatedAt: clientInDb.dataValues.updatedAt,
     });
   }
 }

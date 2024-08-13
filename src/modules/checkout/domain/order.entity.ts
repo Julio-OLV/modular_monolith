@@ -38,4 +38,10 @@ export default class Order extends BaseEntity {
   public get status(): string {
     return this._status;
   }
+
+  public get total(): number {
+    let total = 0;
+    this._products.forEach((product) => (total += product.salesPrice));
+    return total;
+  }
 }

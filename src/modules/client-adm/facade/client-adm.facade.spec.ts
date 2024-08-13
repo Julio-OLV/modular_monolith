@@ -28,7 +28,13 @@ describe("ClientAdmFacade test", () => {
       id: "1",
       name: "Client 1",
       email: "Email 1",
-      address: "Address 1",
+      document: "0000000000",
+      city: "City X",
+      complement: "Complement X",
+      number: "10",
+      state: "State X",
+      street: "Street X",
+      zipCode: "00000-000",
     };
 
     await facade.add(input);
@@ -38,7 +44,7 @@ describe("ClientAdmFacade test", () => {
     expect(clientInDb?.dataValues.id).toEqual(input.id);
     expect(clientInDb?.dataValues.name).toEqual(input.name);
     expect(clientInDb?.dataValues.email).toEqual(input.email);
-    expect(clientInDb?.dataValues.address).toEqual(input.address);
+    expect(clientInDb?.dataValues.street).toEqual(input.street);
   });
 
   it("should find a client", async () => {
@@ -48,7 +54,13 @@ describe("ClientAdmFacade test", () => {
       id: "1",
       name: "client name",
       email: "client@xpto.com",
-      address: "address",
+      document: "0000000000",
+      city: "City X",
+      complement: "Complement X",
+      number: "10",
+      state: "State X",
+      street: "Street X",
+      zipCode: "00000-000",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -59,6 +71,6 @@ describe("ClientAdmFacade test", () => {
     expect(clientInDb.id).toEqual(clientProps.id);
     expect(clientInDb.name).toEqual(clientProps.name);
     expect(clientInDb.email).toEqual(clientProps.email);
-    expect(clientInDb.address).toEqual(clientProps.address);
+    expect(clientInDb.street).toEqual(clientProps.street);
   });
 });
