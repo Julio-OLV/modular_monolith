@@ -1,5 +1,6 @@
 import Id from "../../@shared/domain/value-object/id.value-object";
 import Client from "../domain/client.entity";
+import ClientNotFoundError from "../error/client-not-found.error";
 import ClientGateway from "../gateway/client.gateway";
 import ClientModel from "./client.model";
 
@@ -25,7 +26,7 @@ export default class ClientRepository implements ClientGateway {
     const clientInDb = await ClientModel.findOne({ where: { id } });
 
     if (!clientInDb) {
-      throw new Error("Client not found with id");
+      throw new ClientNotFoundError(id);
     }
 
     return new Client({
