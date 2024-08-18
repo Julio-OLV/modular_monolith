@@ -51,7 +51,7 @@ describe("InvoiceFacade unit test", () => {
         },
       ],
       name: "Name 1",
-      number: 123,
+      number: "123",
       state: "State X",
       street: "Street X",
       zipCode: "00000-000",
