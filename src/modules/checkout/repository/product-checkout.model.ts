@@ -1,11 +1,4 @@
-import {
-  BelongsToMany,
-  Column,
-  Model,
-  PrimaryKey,
-  Table,
-} from "sequelize-typescript";
-import CheckoutModel from "./checkout.model";
+import { Column, Model, PrimaryKey, Table } from "sequelize-typescript";
 
 @Table({
   tableName: "products",
@@ -24,9 +17,6 @@ export default class ProductCheckoutModel extends Model {
 
   @Column({ allowNull: false })
   declare salesPrice: number;
-
-  @BelongsToMany(() => CheckoutModel, "product_id")
-  declare checkouts: CheckoutModel[];
 
   @Column({ allowNull: false })
   declare createdAt: Date;

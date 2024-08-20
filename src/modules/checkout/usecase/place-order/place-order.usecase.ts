@@ -8,6 +8,10 @@ import StoreCatalogFacadeInterface from "../../../store-catalog/facade/store-cat
 import Client from "../../domain/client.entity";
 import Order from "../../domain/order.entity";
 import Product from "../../domain/product.entity";
+import ClientNotFoundError from "../../error/client-not-found.error";
+import NoProductsSelectedError from "../../error/no-products-selected.error";
+import ProductIsNotAvailableInStockError from "../../error/product-is-not-available-in-stock.error";
+import ProductNotFoundError from "../../error/product-not-found.error";
 import CheckoutGateway from "../../gateway/checkout.gateway";
 import {
   PlaceOrderUsecaseInputDto,
@@ -43,7 +47,7 @@ export default class PlaceOrderUsecase implements UseCaseInterface {
   ): Promise<PlaceOrderUsecaseOutputDto> {
     const client = await this._clientFacade.find({ id: input.clientId });
     if (!client) {
-      throw new Error("Client not found");
+      throw new ClientNotFoundError(input.clientId);
     }
 
     await this.validateProducts(input);
@@ -105,7 +109,7 @@ export default class PlaceOrderUsecase implements UseCaseInterface {
   private async getProduct(productId: string): Promise<Product> {
     const product = await this._catalogFacade.find({ id: productId });
     if (!product) {
-      throw new Error("Product not found");
+      throw new ProductNotFoundError(productId);
     }
     const productProps = {
       id: new Id(product.id),
@@ -120,7 +124,7 @@ export default class PlaceOrderUsecase implements UseCaseInterface {
     input: PlaceOrderUsecaseInputDto
   ): Promise<void> {
     if (!input?.products?.length) {
-      throw new Error("No products selected");
+      throw new NoProductsSelectedError();
     }
 
     await this.checkStock(input);
@@ -133,9 +137,7 @@ export default class PlaceOrderUsecase implements UseCaseInterface {
       });
 
       if (product.stock <= 0) {
-        throw new Error(
-          `Product ${product.productId} is not available in stock`
-        );
+        throw new ProductIsNotAvailableInStockError(product.productId);
       }
     }
   }

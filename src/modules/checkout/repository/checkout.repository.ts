@@ -1,4 +1,7 @@
+import Id from "../../@shared/domain/value-object/id.value-object";
+import Client from "../domain/client.entity";
 import Order from "../domain/order.entity";
+import Product from "../domain/product.entity";
 import CheckoutGateway from "../gateway/checkout.gateway";
 import CheckoutModel from "./checkout.model";
 import ProductCheckoutModel from "./product-checkout.model";
@@ -34,6 +37,29 @@ export default class CheckoutRepository implements CheckoutGateway {
   }
 
   async findOrder(id: string): Promise<Order | null> {
-    throw new Error("Method not implemented.");
+    const orderInDb = await CheckoutModel.findOne({
+      where: { id },
+      include: ["client", "products"],
+    });
+
+    return new Order({
+      id: new Id(orderInDb?.dataValues.id),
+      client: new Client({
+        id: new Id(orderInDb?.dataValues.client.id),
+        name: orderInDb?.dataValues.client.name,
+        address: orderInDb?.dataValues.client.address,
+        email: orderInDb?.dataValues.client.email,
+      }),
+      products: orderInDb?.dataValues.products.map(
+        (product: any) =>
+          new Product({
+            id: new Id(product.id),
+            description: product.description,
+            name: product.name,
+            salesPrice: product.salesPrice,
+          })
+      ),
+      status: orderInDb?.dataValues.status,
+    });
   }
 }
