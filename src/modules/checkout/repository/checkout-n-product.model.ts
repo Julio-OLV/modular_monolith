@@ -8,10 +8,10 @@ import CheckoutModel from "./checkout.model";
 })
 export default class CheckoutNProductModel extends Model {
   @ForeignKey(() => CheckoutModel)
-  @Column
+  @Column({ field: "checkout_id" })
   declare checkoutId: string;
 
   @ForeignKey(() => ProductCheckoutModel)
-  @Column
+  @Column({ field: "product_id" })
   declare productId: string;
 }

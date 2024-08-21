@@ -1,5 +1,6 @@
 import * as express from "express";
 import { Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 import {
   PlaceOrderUsecaseInputDto,
   PlaceOrderUsecaseOutputDto,
@@ -11,6 +12,9 @@ import InvoiceFacadeFactory from "../../modules/invoice/factory/facade.factory";
 import TransactionFacadeFactory from "../../modules/payment/factory/transaction.facade.factory";
 import CheckoutRepository from "../../modules/checkout/repository/checkout.repository";
 import PlaceOrderUsecase from "../../modules/checkout/usecase/place-order/place-order.usecase";
+import ClientNotFoundError from "../../modules/checkout/error/client-not-found.error";
+import ProductNotFoundError from "../../modules/checkout/error/product-not-found.error";
+import NoProductsSelectedError from "../../modules/checkout/error/no-products-selected.error";
 
 export const checkoutRoute = express.Router();
 
@@ -38,8 +42,27 @@ checkoutRoute.post(
 
     try {
       const result = await usecase.execute(req.body);
+
+      res.format({
+        json: async () => res.status(StatusCodes.CREATED).send(result),
+      });
     } catch (error) {
+      if (
+        error instanceof ClientNotFoundError ||
+        error instanceof ProductNotFoundError ||
+        error instanceof NoProductsSelectedError
+      ) {
+        console.error(error);
+        res.format({
+          json: async () => res.status(StatusCodes.NOT_FOUND).send(error),
+        });
+      }
+
       console.error(error);
+      res.format({
+        json: async () =>
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error),
+      });
     }
   }
 );

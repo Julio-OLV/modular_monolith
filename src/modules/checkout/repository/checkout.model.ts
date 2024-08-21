@@ -21,7 +21,7 @@ export default class CheckoutModel extends Model {
   declare id: string;
 
   @ForeignKey(() => ClientCheckoutModel)
-  @Column
+  @Column({ field: "client_id" })
   declare clientId: string;
 
   @BelongsTo(() => ClientCheckoutModel)
