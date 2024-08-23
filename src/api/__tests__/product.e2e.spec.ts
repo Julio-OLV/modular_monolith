@@ -43,6 +43,7 @@ describe("E2E product tests", () => {
         name: "Product X",
         description: "Description of product x",
         purchasePrice: 20,
+        salesPrice: 40,
         stock: 5,
       } satisfies AddProductInputDto);
 
@@ -62,6 +63,7 @@ describe("E2E product tests", () => {
         name: "Product X",
         description: "Description of product x",
         purchasePrice: 20,
+        salesPrice: 40,
         stock: 5,
       } satisfies AddProductInputDto);
     await request(app)
@@ -71,6 +73,7 @@ describe("E2E product tests", () => {
         name: "Product Y",
         description: "Description of product y",
         purchasePrice: 40,
+        salesPrice: 80,
         stock: 10,
       } satisfies AddProductInputDto);
 

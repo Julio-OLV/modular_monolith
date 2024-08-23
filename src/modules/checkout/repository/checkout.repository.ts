@@ -20,7 +20,7 @@ export default class CheckoutRepository implements CheckoutGateway {
 
     const products = [];
 
-    // TODO: rever para modificar a promise all
+    // TODO: rever para modificar para promise all
     for await (const product of order.products) {
       const productInDb = await ProductCheckoutModel.findOne({
         where: { id: product.id.id },

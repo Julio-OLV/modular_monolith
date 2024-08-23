@@ -3,7 +3,7 @@ import InvoiceItemsModel from "./invoice-items.model";
 import InvoiceAddressModel from "./invoice-address.model";
 
 @Table({
-  tableName: "invoice_model",
+  tableName: "invoices",
   timestamps: false,
 })
 export default class InvoiceModel extends Model {

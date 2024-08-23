@@ -17,11 +17,12 @@ export default class AddProductUseCase implements UseCaseInterface {
       name: input.name,
       description: input.description,
       purchasePrice: input.purchasePrice,
+      salesPrice: input.salesPrice,
       stock: input.stock,
     };
 
     const product = new Product(props);
-    this._productRepository.add(product);
+    await this._productRepository.add(product);
 
     return {
       id: product.id.id,
