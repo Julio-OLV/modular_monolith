@@ -87,7 +87,7 @@ describe("PlaceOrderUsecase unit tests", () => {
       placeOrderUseCase["_catalogFacade"] = mockCatalogFacade;
 
       await expect(placeOrderUseCase["getProduct"]("0")).rejects.toThrow(
-        new Error("Product not found")
+        new Error("Product not found with id 0")
       );
     });
 
@@ -142,7 +142,7 @@ describe("PlaceOrderUsecase unit tests", () => {
       };
 
       await expect(placeOrderUsecase.execute(input)).rejects.toThrow(
-        new Error("Client not found")
+        new Error("Client not found with id 0")
       );
     });
 

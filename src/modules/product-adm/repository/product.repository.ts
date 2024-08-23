@@ -1,5 +1,6 @@
 import Id from "../../@shared/domain/value-object/id.value-object";
 import Product from "../domain/product.entity";
+import ProductNotFoundError from "../error/product-not-found.error";
 import ProductGateway from "../gateway/product.gateway";
 import ProductModel from "./product.model";
 
@@ -29,7 +30,7 @@ export default class ProductRepository implements ProductGateway {
       });
 
       if (!product) {
-        throw new Error(`Product with id ${id} not found`);
+        throw new ProductNotFoundError(id);
       }
 
       return new Product({

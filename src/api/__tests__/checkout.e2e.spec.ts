@@ -110,4 +110,70 @@ describe("E2E Checkout tests", () => {
     expect(result.statusCode).toBe(StatusCodes.CREATED);
     expect(result.body.total).toBe(440);
   });
+
+  it("should not create a new checkout if client not found", async () => {
+    const productResponse1 = await request(app)
+      .post("/products")
+      .set("Accept", "application/json")
+      .send({
+        name: "Product X",
+        description: "Description of product x",
+        purchasePrice: 20,
+        salesPrice: 40,
+        stock: 5,
+      } satisfies AddProductInputDto);
+
+    const productResponse2 = await request(app)
+      .post("/products")
+      .set("Accept", "application/json")
+      .send({
+        name: "Product Y",
+        description: "Description of product y",
+        purchasePrice: 200,
+        salesPrice: 400,
+        stock: 10,
+      } satisfies AddProductInputDto);
+
+    const result = await request(app)
+      .post("/checkout")
+      .set("Accept", "application/json")
+      .send({
+        clientId: "1",
+        products: [
+          { productId: productResponse1.body.id },
+          { productId: productResponse2.body.id },
+        ],
+      } satisfies PlaceOrderUsecaseInputDto);
+
+    expect(result.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+    expect(result.body.name).toBe("ClientNotFoundError");
+  });
+
+  it("should not create a new checkout if product not found", async () => {
+    const clientResponse = await request(app)
+      .post("/clients")
+      .set("Accept", "application/json")
+      .send({
+        city: "City X",
+        complement: "Complement X",
+        document: "00000000000",
+        email: "email@test.com",
+        name: "Name X",
+        number: "123",
+        state: "State X",
+        street: "Street X",
+        zipCode: "00000000",
+      } satisfies AddClientInputDto);
+
+    const result = await request(app)
+      .post("/checkout")
+      .set("Accept", "application/json")
+      .send({
+        clientId: clientResponse.body.id,
+        products: [{ productId: "1" }, { productId: "2" }],
+      } satisfies PlaceOrderUsecaseInputDto);
+
+    expect(result.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+    expect(result.body.name).toBe("ProductNotFoundError");
+  });
 });

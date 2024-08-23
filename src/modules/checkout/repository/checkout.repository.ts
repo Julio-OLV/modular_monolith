@@ -7,33 +7,33 @@ import CheckoutModel from "./checkout.model";
 import ProductCheckoutModel from "./product-checkout.model";
 
 export default class CheckoutRepository implements CheckoutGateway {
-  // TODO: adicionar transaction
   async addOrder(order: Order): Promise<void> {
-    const result = await CheckoutModel.create({
-      id: order.id.id,
-      status: order.status,
-      total: order.total,
-      clientId: order.client.id.id,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-    });
+    const t = await CheckoutModel.sequelize!.transaction();
 
-    const products = [];
+    try {
+      const result = await CheckoutModel.create(
+        {
+          id: order.id.id,
+          status: order.status,
+          total: order.total,
+          clientId: order.client.id.id,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+        },
+        { transaction: t }
+      );
 
-    // TODO: rever para modificar para promise all
-    for await (const product of order.products) {
-      const productInDb = await ProductCheckoutModel.findOne({
-        where: { id: product.id.id },
-      });
+      const products = await Promise.all(
+        order.products.map((product) => this.getProduct(product.id.id))
+      );
 
-      if (!productInDb) {
-        throw new Error("Product with id not found in database.");
-      }
+      await result.$set("products", [...products], { transaction: t });
 
-      products.push(productInDb);
+      await t.commit();
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
     }
-
-    await result.$set("products", [...products]);
   }
 
   async findOrder(id: string): Promise<Order | null> {
@@ -61,5 +61,17 @@ export default class CheckoutRepository implements CheckoutGateway {
       ),
       status: orderInDb?.dataValues.status,
     });
+  }
+
+  private async getProduct(productId: string): Promise<ProductCheckoutModel> {
+    const productInDb = await ProductCheckoutModel.findOne({
+      where: { id: productId },
+    });
+
+    if (!productInDb) {
+      throw new Error("Product with id not found in database.");
+    }
+
+    return productInDb;
   }
 }

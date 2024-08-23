@@ -35,7 +35,7 @@ export default class ClientAdmFacade implements ClientAdmFacadeInterface {
       document: clientInDb.document,
       city: clientInDb.city,
       complement: clientInDb.complement,
-      number: clientInDb.name,
+      number: clientInDb.number,
       state: clientInDb.state,
       street: clientInDb.street,
       zipCode: clientInDb.zipCode,

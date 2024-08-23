@@ -23,24 +23,24 @@ export default class InvoiceRepository implements InvoiceGateway {
     }
 
     const invoice = new Invoice({
-      id: new Id(invoiceInDb.id),
-      name: invoiceInDb.name,
-      document: invoiceInDb.document,
-      createdAt: invoiceInDb.createdAt,
-      updatedAt: invoiceInDb.updatedAt,
+      id: new Id(invoiceInDb.dataValues.id),
+      name: invoiceInDb.dataValues.name,
+      document: invoiceInDb.dataValues.document,
+      createdAt: invoiceInDb.dataValues.createdAt,
+      updatedAt: invoiceInDb.dataValues.updatedAt,
     });
 
     const address = new Address({
-      city: invoiceInDb.address.city,
-      complement: invoiceInDb.address.complement,
-      number: invoiceInDb.address.number,
-      state: invoiceInDb.address.state,
-      street: invoiceInDb.address.street,
-      zipCode: invoiceInDb.address.zipCode,
+      city: invoiceInDb.dataValues.address.city,
+      complement: invoiceInDb.dataValues.address.complement,
+      number: invoiceInDb.dataValues.address.number,
+      state: invoiceInDb.dataValues.address.state,
+      street: invoiceInDb.dataValues.address.street,
+      zipCode: invoiceInDb.dataValues.address.zipCode,
     });
     invoice.changeAddress(address);
 
-    invoiceInDb.items.map((item) => {
+    invoiceInDb.dataValues.items.map((item: any) => {
       const invoiceItem = new InvoiceItems({
         id: item.id,
         name: item.name,
