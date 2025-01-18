@@ -69,8 +69,8 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: julio-olv
-          REPOSITORY: images
+          REGISTRY_ALIAS: 183631343270
+          REPOSITORY: julio-olv/images
           IMAGE_TAG: ${{ github.event.inputs.image_tag }}
         run: |
           docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
