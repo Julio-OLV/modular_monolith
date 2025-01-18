@@ -48,12 +48,12 @@ jobs:
             });
             console.log(`Approval issue created: ${issue.html_url}`);
 
-      - name: Wait for Approval
-        uses: wagoid/gh-action-await-approval@v2
+      - name: Wait for approval
+        uses: trstringer/manual-approval@v1
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ steps.request-approval.outputs.issue-number }}
-          label: approved
+          secret: ${{ steps.generate_token.outputs.token }}
+          approvers: myteam
+          minimum-approvals: 1
 
   build:
     runs-on: ubuntu-latest
