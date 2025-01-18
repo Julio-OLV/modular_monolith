@@ -30,7 +30,7 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
-  build:
+  build-and-push-docker:
     runs-on: ubuntu-22.04
     needs: unit-tests
     environment: 'PRD'
@@ -49,3 +49,25 @@ jobs:
   
       - name: Build Application
         run: npm run build --if-present
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/my-github-actions-role
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build, tag, and push docker image to Amazon ECR Public
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY_ALIAS: julio-olv
+          REPOSITORY: images
+          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+        run: |
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
