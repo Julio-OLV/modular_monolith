@@ -34,20 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: unit-tests
     steps:
-      - name: Request Approval for Build
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const reviewers = ["tech-lead-username"];
-            const { data: issue } = await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: "Approval for Build Step",
-              body: "Please approve the build step after successful unit tests.",
-              assignees: reviewers,
-            });
-            console.log(`Approval issue created: ${issue.html_url}`);
-
       - name: Wait for approval
         uses: trstringer/manual-approval@v1
         with:
