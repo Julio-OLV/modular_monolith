@@ -12,7 +12,7 @@ on:
 
 jobs:
   unit-tests:
-    runs-on: ubuntu-22
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
         run: npm test
 
   build:
-    runs-on: ubuntu-22
+    runs-on: ubuntu-22.04
     needs: unit-tests
     environment: 'PRD'
     steps:
