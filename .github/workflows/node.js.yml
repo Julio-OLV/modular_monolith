@@ -34,7 +34,7 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
-  build-and-push-docker:
+  build-and-push-image:
     runs-on: ubuntu-22.04
     needs: unit-tests
     environment: 'PRD'
