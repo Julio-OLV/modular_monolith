@@ -6,7 +6,6 @@
     "test": "jest",
     "build": "tsc",
     "lint": "tslint -c tslint.json src/**/*.ts",
-    "prepublish": "npm run build",
     "tsc": "tsc",
     "dev": "nodemon src/infrastructure/api/server.ts",
     "migrate": "node -r ts-node/register/transpile-only ./src/infrastructure/sequelize/config-migrations/migrator-cli.ts"
