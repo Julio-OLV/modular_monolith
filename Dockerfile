@@ -11,4 +11,4 @@ COPY dist ./dist
 EXPOSE 3000
 
 # Define o comando para iniciar a aplicação a partir do build
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/api/server.js"]
