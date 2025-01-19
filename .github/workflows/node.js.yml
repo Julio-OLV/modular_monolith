@@ -7,72 +7,103 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: 'Tag for the Docker image'
+        description: "Tag for the Docker image"
         required: true
 
 permissions:
   id-token: write
   contents: read
+  packages: write
 
 jobs:
-  unit-tests:
+  # unit-tests:
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ github.event.inputs.branch }}
+
+  #     - name: Setup Node.js 22.x
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "22.x"
+  #         cache: "npm"
+
+  #     - name: Install Dependencies
+  #       run: npm ci
+
+  #     - name: Run Unit Tests
+  #       run: npm test
+
+  # build-and-push-image:
+  #   runs-on: ubuntu-22.04
+  #   needs: unit-tests
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+
+  #     - name: Use Node.js 22.x
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "22.x"
+  #         cache: "npm"
+
+  #     - name: Install Dependencies
+  #       run: npm ci
+
+  #     - name: Build Application
+  #       run: npm run build --if-present
+
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.ROLE }}
+  #         aws-region: ${{ secrets.REGION }}
+
+  #     - name: Login to Amazon ECR Public
+  #       id: login-ecr-public
+  #       uses: aws-actions/amazon-ecr-login@v2
+  #       with:
+  #         registry-type: public
+
+  #     - name: Build, tag, and push docker image to Amazon ECR Public
+  #       env:
+  #         REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+  #         REGISTRY_ALIAS: ${{ secrets.REGISTRY_ALIAS }}
+  #         REPOSITORY: ${{ secrets.REPOSITORY }}
+  #         IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+  #       run: |
+  #         docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
+  #         docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+
+  deploy-sit:
     runs-on: ubuntu-22.04
+    # needs: build-and-push-image
+    environment: "PRD"
     steps:
-      - name: Checkout Code
+      - name: Checkout Infrastructure Code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch }}
+          repository: Julio-OLV/terraform-template
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node.js 22.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Unit Tests
-        run: npm test
-
-  build-and-push-image:
-    runs-on: ubuntu-22.04
-    needs: unit-tests
-    environment: 'PRD'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-    
-      - name: Use Node.js 22.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-  
-      - name: Install Dependencies
-        run: npm ci
-  
-      - name: Build Application
-        run: npm run build --if-present
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.ROLE }}
-          aws-region: ${{ secrets.REGION }}
-
-      - name: Login to Amazon ECR Public
-        id: login-ecr-public
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
-
-      - name: Build, tag, and push docker image to Amazon ECR Public
-        env:
-          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: ${{ secrets.REGISTRY_ALIAS }}
-          REPOSITORY: ${{ secrets.REPOSITORY }}
-          IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+      - name: Replace Docker Image Tag in Terraform Template
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          sed -i "s|image_tag_placeholder|${{ env.IMAGE_TAG }}|g" sit/variables.tf
+
+      - name: Replace SSH Key in Terraform Template
+        run: |
+          sed -i "s|ssh_public_key_placeholder|${{ secrets.EC2_SSH_PUBLIC_KEY }}|g" sit/variables.tf
+
+      - name: Apply Terraform for SIT
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TF_VAR_ssh_public_key: ${{ secrets.EC2_SSH_PUBLIC_KEY }}
+        run: |
+          cd sit
+          terraform init
+          terraform plan -out=plan.out
+          terraform apply -auto-approve
