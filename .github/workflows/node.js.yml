@@ -105,5 +105,4 @@ jobs:
         run: |
           cd sit
           terraform init
-          terraform plan -out=plan.out
           terraform apply -auto-approve
